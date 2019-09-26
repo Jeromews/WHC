@@ -1,0 +1,4 @@
+rootProject.name = 'whc'
+include 'whc-client'
+include 'whc-server'
+

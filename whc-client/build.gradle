@@ -1,0 +1,42 @@
+
+apply plugin: 'java'
+
+apply plugin: 'idea'
+apply plugin: 'application'
+
+group 'com.jerome.chat'
+version '1.0'
+
+mainClassName = 'MyChatServer'
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+
+repositories {
+    maven {
+        name "aliyunmaven"
+        url "http://maven.aliyun.com/nexus/content/groups/public/"
+    }
+}
+
+
+dependencies {
+    compile(
+            'io.netty:netty-all:4.1.22.Final',
+            'org.apache.commons:commons-lang3:3.3.2',
+            'commons-codec:commons-codec:1.11',
+            'org.slf4j:slf4j-log4j12:1.7.25',
+            'commons-logging:commons-logging:1.2'
+    )
+}
+
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.jerome.chat.whc.client.MyChatClient'
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
