@@ -40,7 +40,7 @@ public class MyChatClient {
                     pipeline.addLast(new MyChatClientHandler());
                 }
             });
-            Channel channel = bootstrap.connect("10.57.241.144", 8889).sync().channel();
+            Channel channel = bootstrap.connect("10.57.242.95", 8889).sync().channel();
             //读取控制台输入的内容
             BufferedReader bufferReader = new BufferedReader(new InputStreamReader(System.in));
             for (; ; ) {

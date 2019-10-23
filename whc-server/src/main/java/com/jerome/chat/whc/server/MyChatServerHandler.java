@@ -75,13 +75,15 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
 
     private String getName(Channel channel) {
         String ip = channel.remoteAddress().toString().split(":")[0];
-        if (StringUtils.equals(ip, "/10.57.242.209")) {
+        if (StringUtils.equals(ip, "/10.57.243.26")) {
             return "陈康";
-        } else if (StringUtils.equals(ip, "/10.57.241.225")) {
-            return "王晟";
-        } else if (StringUtils.equals(ip, "/10.57.240.26")) {
-            return "郝宗强";
-        } else {
+        } else if (StringUtils.equals(ip, "/10.57.242.95")) {
+            return "陈康的叔叔";
+        } else if (StringUtils.equals(ip, "/10.57.240.189")) {
+            return "陈康的爸爸";
+        } else if (StringUtils.equals(ip, "/10.57.242.13")) {
+            return "陈康的舅舅";
+        }  else {
             return "未知人物";
         }
     }
