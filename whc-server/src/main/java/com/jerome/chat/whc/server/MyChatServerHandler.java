@@ -61,10 +61,11 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
         Pattern p1 = Pattern.compile("-u (\\w+) -p");
         Pattern p2 = Pattern.compile("-p (\\w+) -e");
         Pattern p3 = Pattern.compile("-ch (\\w+) -p");
-        Pattern p4 = Pattern.compile("-p (\\w+) -r");
+        Pattern p4 = Pattern.compile("-p (\\w+) -n");
         Pattern p5 = Pattern.compile("-n (\\w+) -e");
         Pattern p6 = Pattern.compile("-ri (\\w+) -p");
         Pattern p7 = Pattern.compile(".{3}-r (.*) -e");
+        Pattern p8 = Pattern.compile("-p (\\w+) -r");
         Matcher m1 = p1.matcher(decrypt);
         Matcher m2 = p2.matcher(decrypt);
         Matcher m3 = p3.matcher(decrypt);
@@ -72,6 +73,7 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
         Matcher m5 = p5.matcher(decrypt);
         Matcher m6 = p6.matcher(decrypt);
         Matcher m7 = p7.matcher(decrypt);
+        Matcher m8 = p8.matcher(decrypt);
         String loginAccountName = "";
         String password = "";
         String changeAccountName = "";
@@ -79,6 +81,7 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
         String newPassword = "";
         String registryAccountName = "";
         String realName = "";
+        String registryPassword = "";
         while (m1.find()) {
             loginAccountName = m1.group(1);
         }
@@ -100,6 +103,9 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
         while (m7.find()) {
             realName = m7.group(1);
         }
+        while (m8.find()) {
+            registryPassword = m8.group(1);
+        }
         String accountName = connectedList.get(channel.remoteAddress().toString());
         if (StringUtils.isNotBlank(accountName)) {
             if (StringUtils.equals(decrypt.substring(0, 3), "-ch")) {
@@ -116,7 +122,7 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
                 channel.writeAndFlush(encrypt(returnMsg) + "\n");
                 return;
             } else if (StringUtils.equals(decrypt.substring(0, 3), "-ri")) {
-                String returnMsg = registryAccount(registryAccountName, oldPassword, realName);
+                String returnMsg = registryAccount(registryAccountName, registryPassword, realName);
                 channel.writeAndFlush(encrypt(returnMsg) + "\n");
                 return;
             }
@@ -159,7 +165,7 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
                     checkMsg = "用户名或密码错误，请重试";
                 }
             } else if (StringUtils.equals(decrypt.substring(0, 3), "-ri")) {
-                String returnMsg = registryAccount(registryAccountName, oldPassword, realName);
+                String returnMsg = registryAccount(registryAccountName, registryPassword, realName);
                 channel.writeAndFlush(encrypt(returnMsg) + "\n");
                 return;
             }
