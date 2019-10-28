@@ -130,9 +130,9 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
                     }
                 }
                 String name = getName(accountName);
-                StringBuilder stringBuilder = new StringBuilder();
                 channelGroup.forEach(ch -> {
                     try {
+                        StringBuilder stringBuilder = new StringBuilder();
                         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         String encrypt = encrypt(stringBuilder.append(df.format(new Date())).append(" ").append(name).append(":").append(decrypt).toString());
                         ch.writeAndFlush(encrypt + "\n");
