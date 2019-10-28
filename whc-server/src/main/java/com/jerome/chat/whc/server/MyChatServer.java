@@ -17,13 +17,9 @@ import io.netty.util.CharsetUtil;
  * @date 2019/9/2
  */
 public class MyChatServer {
-
-
-
     public static void main(String[] args) throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).
@@ -38,13 +34,13 @@ public class MyChatServer {
                     });
             ChannelFuture channelFuture = serverBootstrap.bind(8889).sync();
             channelFuture.channel().closeFuture().sync();
+
             System.out.println("started");
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
     }
-
 
 
 }

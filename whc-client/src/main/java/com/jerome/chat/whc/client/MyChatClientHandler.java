@@ -1,7 +1,6 @@
 package com.jerome.chat.whc.client;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
@@ -21,7 +20,7 @@ public class MyChatClientHandler extends SimpleChannelInboundHandler<String> {
         System.out.println(decrypt(msg));
     }
 
-    private static String decrypt(String encryptContent) throws Exception{
+    private static String decrypt(String encryptContent) throws Exception {
         byte[] raw = key.getBytes(StandardCharsets.UTF_8);
         SecretKeySpec secretKeySpec = new SecretKeySpec(raw, "AES");
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
