@@ -50,131 +50,134 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-        String decrypt = decrypt(msg);
         Channel channel = ctx.channel();
-        if (decrypt.equals("-help")) {
-            String returnMsg = "登录请输入：-u 账户名 -p 密码 -e \n修改密码请输入：-ch 账户名 -p 原密码 -n 新密码 -e\n" +
-                    "注册用户请输入：-ri 账户名 -p 密码 -r 真实姓名（非法姓名，如'陈康的爸爸'等直接后台定期移除账号） -e";
-            channel.writeAndFlush(encrypt(returnMsg) + "\n");
-            return;
-        }
-        Pattern p1 = Pattern.compile("-u (\\w+) -p");
-        Pattern p2 = Pattern.compile("-p (\\w+) -e");
-        Pattern p3 = Pattern.compile("-ch (\\w+) -p");
-        Pattern p4 = Pattern.compile("-p (\\w+) -n");
-        Pattern p5 = Pattern.compile("-n (\\w+) -e");
-        Pattern p6 = Pattern.compile("-ri (\\w+) -p");
-        Pattern p7 = Pattern.compile(".{3}-r (.*) -e");
-        Pattern p8 = Pattern.compile("-p (\\w+) -r");
-        Matcher m1 = p1.matcher(decrypt);
-        Matcher m2 = p2.matcher(decrypt);
-        Matcher m3 = p3.matcher(decrypt);
-        Matcher m4 = p4.matcher(decrypt);
-        Matcher m5 = p5.matcher(decrypt);
-        Matcher m6 = p6.matcher(decrypt);
-        Matcher m7 = p7.matcher(decrypt);
-        Matcher m8 = p8.matcher(decrypt);
-        String loginAccountName = "";
-        String password = "";
-        String changeAccountName = "";
-        String oldPassword = "";
-        String newPassword = "";
-        String registryAccountName = "";
-        String realName = "";
-        String registryPassword = "";
-        while (m1.find()) {
-            loginAccountName = m1.group(1);
-        }
-        while (m2.find()) {
-            password = m2.group(1);
-        }
-        while (m3.find()) {
-            changeAccountName = m3.group(1);
-        }
-        while (m4.find()) {
-            oldPassword = m4.group(1);
-        }
-        while (m5.find()) {
-            newPassword = m5.group(1);
-        }
-        while (m6.find()) {
-            registryAccountName = m6.group(1);
-        }
-        while (m7.find()) {
-            realName = m7.group(1);
-        }
-        while (m8.find()) {
-            registryPassword = m8.group(1);
-        }
-        String accountName = connectedList.get(channel.remoteAddress().toString());
-        if (StringUtils.isNotBlank(accountName)) {
-            if (decrypt.length() >= 2) {
-                if (StringUtils.equals(decrypt.substring(0, 3), "-ch")) {
-                    if (checkAccount(changeAccountName, oldPassword)) {
-                        channel.writeAndFlush(encrypt(changePassword(changeAccountName, newPassword)) + "\n");
+        try {
+            String decrypt = decrypt(msg);
+            if (decrypt.equals("-help")) {
+                String returnMsg = "登录请输入：-u 账户名 -p 密码 -e \n修改密码请输入：-ch 账户名 -p 原密码 -n 新密码 -e\n" +
+                        "注册用户请输入：-ri 账户名 -p 密码 -r 真实姓名（非法姓名，如'陈康的爸爸'等直接后台定期移除账号） -e";
+                channel.writeAndFlush(encrypt(returnMsg) + "\n");
+                return;
+            }
+            Pattern p1 = Pattern.compile("-u (\\w+) -p");
+            Pattern p2 = Pattern.compile("-p (\\w+) -e");
+            Pattern p3 = Pattern.compile("-ch (\\w+) -p");
+            Pattern p4 = Pattern.compile("-p (\\w+) -n");
+            Pattern p5 = Pattern.compile("-n (\\w+) -e");
+            Pattern p6 = Pattern.compile("-ri (\\w+) -p");
+            Pattern p7 = Pattern.compile(".{3}-r (.*) -e");
+            Pattern p8 = Pattern.compile("-p (\\w+) -r");
+            Matcher m1 = p1.matcher(decrypt);
+            Matcher m2 = p2.matcher(decrypt);
+            Matcher m3 = p3.matcher(decrypt);
+            Matcher m4 = p4.matcher(decrypt);
+            Matcher m5 = p5.matcher(decrypt);
+            Matcher m6 = p6.matcher(decrypt);
+            Matcher m7 = p7.matcher(decrypt);
+            Matcher m8 = p8.matcher(decrypt);
+            String loginAccountName = "";
+            String password = "";
+            String changeAccountName = "";
+            String oldPassword = "";
+            String newPassword = "";
+            String registryAccountName = "";
+            String realName = "";
+            String registryPassword = "";
+            while (m1.find()) {
+                loginAccountName = m1.group(1);
+            }
+            while (m2.find()) {
+                password = m2.group(1);
+            }
+            while (m3.find()) {
+                changeAccountName = m3.group(1);
+            }
+            while (m4.find()) {
+                oldPassword = m4.group(1);
+            }
+            while (m5.find()) {
+                newPassword = m5.group(1);
+            }
+            while (m6.find()) {
+                registryAccountName = m6.group(1);
+            }
+            while (m7.find()) {
+                realName = m7.group(1);
+            }
+            while (m8.find()) {
+                registryPassword = m8.group(1);
+            }
+            String accountName = connectedList.get(channel.remoteAddress().toString());
+            if (StringUtils.isNotBlank(accountName)) {
+                if (decrypt.length() >= 3) {
+                    if (StringUtils.equals(decrypt.substring(0, 3), "-ch")) {
+                        if (checkAccount(changeAccountName, oldPassword)) {
+                            channel.writeAndFlush(encrypt(changePassword(changeAccountName, newPassword)) + "\n");
+                            return;
+                        } else {
+                            String checkMsg = "用户名或密码错误，请重试";
+                            channel.writeAndFlush(encrypt(checkMsg) + "\n");
+                            return;
+                        }
+                    } else if (StringUtils.equals(decrypt.substring(0, 2), "-u")) {
+                        String returnMsg = "当前已登录，请勿重复登录";
+                        channel.writeAndFlush(encrypt(returnMsg) + "\n");
                         return;
-                    } else {
-                        String checkMsg = "用户名或密码错误，请重试";
-                        channel.writeAndFlush(encrypt(checkMsg) + "\n");
+                    } else if (StringUtils.equals(decrypt.substring(0, 3), "-ri")) {
+                        String returnMsg = registryAccount(registryAccountName, registryPassword, realName);
+                        channel.writeAndFlush(encrypt(returnMsg) + "\n");
                         return;
                     }
-                } else if (StringUtils.equals(decrypt.substring(0, 2), "-u")) {
-                    String returnMsg = "当前已登录，请勿重复登录";
-                    channel.writeAndFlush(encrypt(returnMsg) + "\n");
+                }
+                String name = getName(accountName);
+                StringBuilder stringBuilder = new StringBuilder();
+                channelGroup.forEach(ch -> {
+                    try {
+                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String encrypt = encrypt(stringBuilder.append(df.format(new Date())).append(" ").append(name).append(":").append(decrypt).toString());
+                        ch.writeAndFlush(encrypt + "\n");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+
+            } else {
+
+                String checkMsg = "";
+                if (decrypt.length() < 2) {
                     return;
+                }
+                if (StringUtils.equals(decrypt.substring(0, 2), "-u") && (StringUtils.isBlank(loginAccountName) || StringUtils.isBlank(password))) {
+                    channel.writeAndFlush(encrypt("请输入正确的用户名密码") + "\n");
+                    return;
+                } else if (StringUtils.equals(decrypt.substring(0, 3), "-ch") && (StringUtils.isBlank(changeAccountName) || StringUtils.isBlank(oldPassword))) {
+                    channel.writeAndFlush(encrypt("请输入正确的用户名密码") + "\n");
+                    return;
+                }
+                if (StringUtils.equals(decrypt.substring(0, 3), "-ch")) {
+                    if (checkAccount(changeAccountName, oldPassword)) {
+                        checkMsg = changePassword(changeAccountName, newPassword);
+                    } else {
+                        checkMsg = "用户名或密码错误，请重试";
+                    }
+                } else if (StringUtils.equals(decrypt.substring(0, 2), "-u")) {
+                    if (checkAccount(loginAccountName, password)) {
+                        checkMsg = "登录成功";
+                        connectedList.put(channel.remoteAddress().toString(), loginAccountName);
+                    } else {
+                        checkMsg = "用户名或密码错误，请重试";
+                    }
                 } else if (StringUtils.equals(decrypt.substring(0, 3), "-ri")) {
                     String returnMsg = registryAccount(registryAccountName, registryPassword, realName);
                     channel.writeAndFlush(encrypt(returnMsg) + "\n");
                     return;
                 }
-            }
-            String name = getName(accountName);
-            StringBuilder stringBuilder = new StringBuilder();
-            channelGroup.forEach(ch -> {
-                try {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    String encrypt = encrypt(stringBuilder.append(df.format(new Date())).append(" ").append(name).append(":").append(decrypt).toString());
-                    ch.writeAndFlush(encrypt + "\n");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
+                channel.writeAndFlush(encrypt(checkMsg) + "\n");
 
-        } else {
-
-            String checkMsg = "";
-            if (decrypt.length() < 2) {
-                return;
             }
-            if (StringUtils.equals(decrypt.substring(0, 2), "-u") && (StringUtils.isBlank(loginAccountName) || StringUtils.isBlank(password))) {
-                channel.writeAndFlush(encrypt("请输入正确的用户名密码") + "\n");
-                return;
-            } else if (StringUtils.equals(decrypt.substring(0, 3), "-ch") && (StringUtils.isBlank(changeAccountName) || StringUtils.isBlank(oldPassword))) {
-                channel.writeAndFlush(encrypt("请输入正确的用户名密码") + "\n");
-                return;
-            }
-            if (StringUtils.equals(decrypt.substring(0, 3), "-ch")) {
-                if (checkAccount(changeAccountName, oldPassword)) {
-                    checkMsg = changePassword(changeAccountName, newPassword);
-                } else {
-                    checkMsg = "用户名或密码错误，请重试";
-                }
-            } else if (StringUtils.equals(decrypt.substring(0, 2), "-u")) {
-                if (checkAccount(loginAccountName, password)) {
-                    checkMsg = "登录成功";
-                    connectedList.put(channel.remoteAddress().toString(), loginAccountName);
-                } else {
-                    checkMsg = "用户名或密码错误，请重试";
-                }
-            } else if (StringUtils.equals(decrypt.substring(0, 3), "-ri")) {
-                String returnMsg = registryAccount(registryAccountName, registryPassword, realName);
-                channel.writeAndFlush(encrypt(returnMsg) + "\n");
-                return;
-            }
-            channel.writeAndFlush(encrypt(checkMsg) + "\n");
-
+        }catch(Exception e){
+            channel.writeAndFlush(encrypt("未知错误") + "\n");
         }
-
     }
 
 
