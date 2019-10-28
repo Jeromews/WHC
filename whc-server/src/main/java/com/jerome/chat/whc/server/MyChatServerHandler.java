@@ -108,23 +108,25 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
         }
         String accountName = connectedList.get(channel.remoteAddress().toString());
         if (StringUtils.isNotBlank(accountName)) {
-            if (StringUtils.equals(decrypt.substring(0, 3), "-ch")) {
-                if (checkAccount(changeAccountName, oldPassword)) {
-                    channel.writeAndFlush(encrypt(changePassword(changeAccountName, newPassword)) + "\n");
+            if (decrypt.length() >= 2) {
+                if (StringUtils.equals(decrypt.substring(0, 3), "-ch")) {
+                    if (checkAccount(changeAccountName, oldPassword)) {
+                        channel.writeAndFlush(encrypt(changePassword(changeAccountName, newPassword)) + "\n");
+                        return;
+                    } else {
+                        String checkMsg = "用户名或密码错误，请重试";
+                        channel.writeAndFlush(encrypt(checkMsg) + "\n");
+                        return;
+                    }
+                } else if (StringUtils.equals(decrypt.substring(0, 2), "-u")) {
+                    String returnMsg = "当前已登录，请勿重复登录";
+                    channel.writeAndFlush(encrypt(returnMsg) + "\n");
                     return;
-                } else {
-                    String checkMsg = "用户名或密码错误，请重试";
-                    channel.writeAndFlush(encrypt(checkMsg) + "\n");
+                } else if (StringUtils.equals(decrypt.substring(0, 3), "-ri")) {
+                    String returnMsg = registryAccount(registryAccountName, registryPassword, realName);
+                    channel.writeAndFlush(encrypt(returnMsg) + "\n");
                     return;
                 }
-            } else if (StringUtils.equals(decrypt.substring(0, 2), "-u")) {
-                String returnMsg = "当前已登录，请勿重复登录";
-                channel.writeAndFlush(encrypt(returnMsg) + "\n");
-                return;
-            } else if (StringUtils.equals(decrypt.substring(0, 3), "-ri")) {
-                String returnMsg = registryAccount(registryAccountName, registryPassword, realName);
-                channel.writeAndFlush(encrypt(returnMsg) + "\n");
-                return;
             }
             String name = getName(accountName);
             StringBuilder stringBuilder = new StringBuilder();
@@ -287,7 +289,7 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
         FileInputStream fileInputStream = new FileInputStream(filePath);
         InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
         properties.load(inputStreamReader);
-        properties.setProperty(changeAccountName+".password", newPassword);
+        properties.setProperty(changeAccountName + ".password", newPassword);
         FileOutputStream oFile;
         oFile = new FileOutputStream(filePath);
         //将Properties中的属性列表（键和元素对）写入输出流
