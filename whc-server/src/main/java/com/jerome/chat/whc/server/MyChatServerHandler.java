@@ -287,7 +287,7 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
         FileInputStream fileInputStream = new FileInputStream(filePath);
         InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
         properties.load(inputStreamReader);
-        properties.setProperty(changeAccountName, newPassword);
+        properties.setProperty(changeAccountName+".password", newPassword);
         FileOutputStream oFile;
         oFile = new FileOutputStream(filePath);
         //将Properties中的属性列表（键和元素对）写入输出流
