@@ -53,6 +53,9 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
         Channel channel = ctx.channel();
         try {
             String decrypt = decrypt(msg);
+            if(StringUtils.isBlank(decrypt)){
+                return;
+            }
             if (decrypt.equals("-help")) {
                 String returnMsg = "登录请输入：-u 账户名 -p 密码 -e \n修改密码请输入：-ch 账户名 -p 原密码 -n 新密码 -e\n" +
                         "注册用户请输入：-ri 账户名 -p 密码 -r 真实姓名（非法姓名，如'陈康的爸爸'等直接后台定期移除账号） -e";
