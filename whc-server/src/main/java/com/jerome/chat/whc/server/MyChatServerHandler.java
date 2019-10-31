@@ -72,11 +72,11 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
             if (StringUtils.isBlank(decrypt)) {
                 return;
             }
-            String returnMsg = "";
+            String returnMsg;
             if (decrypt.equals("-help")) {
                 returnMsg = "登录请输入：-u 账户名 -p 密码 -e \n修改密码请输入：-ch 账户名 -p 原密码 -n 新密码 -e\n" +
                         "注册用户请输入：-ri 账户名 -p 密码 -r 真实姓名 -e（非法姓名，如'陈康的爸爸'等直接后台定期移除账号） \n" +
-                        "私聊请输入：-pri 账户名 -e \n" +
+                        "私聊请输入：-pri 对方账户名 -e \n" +
                         "接到私聊请求后，同意请输入-accept,即可开始私聊，拒绝请输入-refuse。（注：私聊双方将无法看见聊天室信息）\n" +
                         "若想退出私聊，请输入-exitPrivate \n" +
                         "查看当前在线用户请输入：-all";
