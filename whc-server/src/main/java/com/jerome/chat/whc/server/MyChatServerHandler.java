@@ -240,6 +240,14 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
                         curChannelInfo.setChannel(channel);
                         connectedList.put(channel.remoteAddress().toString(), curChannelInfo);
                         accountChannelMap.put(curChannelInfo.getAccountName(), curChannelInfo);
+                        channelGroup.forEach(ch -> {
+                            try {
+                                String encrypt = encrypt(curChannelInfo.getRealName()+"上线啦！");
+                                ch.writeAndFlush(encrypt + "\n");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
                     } else {
                         checkMsg = "用户名或密码错误，请重试";
                     }
