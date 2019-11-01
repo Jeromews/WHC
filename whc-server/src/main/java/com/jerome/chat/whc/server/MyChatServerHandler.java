@@ -166,7 +166,7 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
                             initiator.getChannel().writeAndFlush(encrypt(returnMsg) + "\n");
                             return;
                         }
-                    }else if(StringUtils.equals(decrypt,"-exitPrivate")){
+                    } else if (StringUtils.equals(decrypt, "-exitPrivate")) {
                         PrivateChatChannelInfo initiator = privateChatMap.get(channelInfo.getAccountName());
                         if (initiator == null) {
                             return;
@@ -175,7 +175,7 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
                             privateChatMap.remove(channelInfo.getAccountName());
                             returnMsg = "已经退出私聊回到聊天室拉。";
                             initiator.getChannel().writeAndFlush(encrypt(returnMsg) + "\n");
-                            channelInfo.getChannel().writeAndFlush(encrypt("对方取消了私聊"+returnMsg) + "\n");
+                            channelInfo.getChannel().writeAndFlush(encrypt("对方取消了私聊" + returnMsg) + "\n");
                             return;
                         }
                     }
@@ -240,9 +240,10 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
                         curChannelInfo.setChannel(channel);
                         connectedList.put(channel.remoteAddress().toString(), curChannelInfo);
                         accountChannelMap.put(curChannelInfo.getAccountName(), curChannelInfo);
+                        channelGroup.add(channel);
                         channelGroup.forEach(ch -> {
                             try {
-                                String encrypt = encrypt(curChannelInfo.getRealName()+"上线啦！");
+                                String encrypt = encrypt(curChannelInfo.getRealName() + "上线啦！😁");
                                 ch.writeAndFlush(encrypt + "\n");
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -267,11 +268,11 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-        Channel channel = ctx.channel();
+        //Channel channel = ctx.channel();
         //String accountName = connectedList.get(channel.remoteAddress().toString());
         //String name = getName(accountName);
         //channelGroup.writeAndFlush(encrypt("用户-" + name + "加入聊天室\n"));
-        channelGroup.add(channel);
+        //channelGroup.add(channel);
     }
 
     @Override
@@ -280,7 +281,17 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
 //        String accountName = connectedList.get(channel.remoteAddress().toString());
 //        String name = getName(accountName);
         channelGroup.remove(channel);
-        //channelGroup.writeAndFlush(encrypt("用户-" + name + "离开聊天室\n"));
+        ChannelInfo channelInfo = connectedList.get(channel.remoteAddress().toString());
+        if (channelInfo != null) {
+            channelGroup.forEach(ch -> {
+                try {
+                    String encrypt = encrypt(channelInfo.getRealName() + "下线了。😢");
+                    ch.writeAndFlush(encrypt + "\n");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
 //    @Override
